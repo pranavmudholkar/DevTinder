@@ -28,6 +28,30 @@ app.post('/signup', async (req, res, next) => {
 	} catch {
 		res.status(400).send('Error saving the user: ' + err.message);
 	}
+=======
+app.use('/', (err, req, res, next) => {
+	if (err) {
+		res.status(500).send('something went wrong');
+	}
+});
+
+app.get('/admin/getUserData', (req, res, next) => {
+	// try {
+	throw new Error('sasdasd');
+	res.send('All Data sent');
+	// } catch {
+	// res.status(500).send('Something went wrong, contact the support team');
+	// }
+});
+
+app.use('/', (err, req, res, next) => {
+	if (err) {
+		res.status(500).send('something went wrong');
+	}
+});
+app.listen(3000, () => {
+	console.log('Hi From the port 3000');
+
 });
 
 //We calling connect DB first becaause we should always connect to the DB before we start listening to the incoming requests on the server.
