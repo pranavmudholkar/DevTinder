@@ -3,6 +3,8 @@ const User = require('./models/user');
 const connectDB = require('./config/database');
 const app = express();
 
+app.use(express.json());
+
 app.post('/signup', async (req, res, next) => {
 	// const userObj = {
 	// 	firstName: 'Pranav',
@@ -15,12 +17,14 @@ app.post('/signup', async (req, res, next) => {
 	// const user = new User(userObj);
 
 	// Creating an instance of the user model by passing the obj directly as an argument
-	const user = new User({
-		firstName: 'Virat',
-		lastName: 'Kohli',
-		emailId: 'virat@gmail.com',
-		password: 'virat@123',
-	});
+	// const user = new User({
+	// 	firstName: 'MS',
+	// 	lastName: 'Dhoni',
+	// 	emailId: 'MSDhoni@gmail.com',
+	// 	password: 'Dhoni@777',
+	// });
+
+	const user = new User(req.body);
 	try {
 		await user.save();
 
