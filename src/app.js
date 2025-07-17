@@ -3,6 +3,8 @@ const User = require('./models/user');
 const connectDB = require('./config/database');
 const app = express();
 
+app.use(express.json());
+
 app.post('/signup', async (req, res, next) => {
 	// const userObj = {
 	// 	firstName: 'Pranav',
@@ -15,12 +17,14 @@ app.post('/signup', async (req, res, next) => {
 	// const user = new User(userObj);
 
 	// Creating an instance of the user model by passing the obj directly as an argument
-	const user = new User({
-		firstName: 'Virat',
-		lastName: 'Kohli',
-		emailId: 'virat@gmail.com',
-		password: 'virat@123',
-	});
+	// const user = new User({
+	// 	firstName: 'MS',
+	// 	lastName: 'Dhoni',
+	// 	emailId: 'MSDhoni@gmail.com',
+	// 	password: 'Dhoni@777',
+	// });
+
+	const user = new User(req.body);
 	try {
 		await user.save();
 
@@ -28,30 +32,39 @@ app.post('/signup', async (req, res, next) => {
 	} catch {
 		res.status(400).send('Error saving the user: ' + err.message);
 	}
-=======
-app.use('/', (err, req, res, next) => {
-	if (err) {
-		res.status(500).send('something went wrong');
+});
+
+app.get('/user', async (req, res) => {
+	try {
+		const user = await User.findOne({
+			emailId: req.body.emailId,
+		});
+		if (!user) res.status(404).send('user not found');
+		else res.send(user);
+		// const users = await User.find({
+		// 	emailId: req.body.emailId,
+		// });
+		// if (users.length === 0) {
+		// 	res.status(404).send('user not found');
+		// } else {
+		// 	res.send(users);
+		// }
+	} catch (err) {
+		res.status(404).send('something went wrong');
 	}
 });
 
-app.get('/admin/getUserData', (req, res, next) => {
-	// try {
-	throw new Error('sasdasd');
-	res.send('All Data sent');
-	// } catch {
-	// res.status(500).send('Something went wrong, contact the support team');
-	// }
-});
-
-app.use('/', (err, req, res, next) => {
-	if (err) {
-		res.status(500).send('something went wrong');
+app.get('/feed', async (req, res) => {
+	try {
+		const users = await User.find();
+		if (users.length === 0) {
+			res.status(404).send('Data not found');
+		} else {
+			res.send(users);
+		}
+	} catch (err) {
+		res.status(404).send('something went wrong');
 	}
-});
-app.listen(3000, () => {
-	console.log('Hi From the port 3000');
-
 });
 
 //We calling connect DB first becaause we should always connect to the DB before we start listening to the incoming requests on the server.
