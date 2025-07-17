@@ -34,6 +34,39 @@ app.post('/signup', async (req, res, next) => {
 	}
 });
 
+app.get('/user', async (req, res) => {
+	try {
+		const user = await User.findOne({
+			emailId: req.body.emailId,
+		});
+		if (!user) res.status(404).send('user not found');
+		else res.send(user);
+		// const users = await User.find({
+		// 	emailId: req.body.emailId,
+		// });
+		// if (users.length === 0) {
+		// 	res.status(404).send('user not found');
+		// } else {
+		// 	res.send(users);
+		// }
+	} catch (err) {
+		res.status(404).send('something went wrong');
+	}
+});
+
+app.get('/feed', async (req, res) => {
+	try {
+		const users = await User.find();
+		if (users.length === 0) {
+			res.status(404).send('Data not found');
+		} else {
+			res.send(users);
+		}
+	} catch (err) {
+		res.status(404).send('something went wrong');
+	}
+});
+
 //We calling connect DB first becaause we should always connect to the DB before we start listening to the incoming requests on the server.
 connectDB()
 	.then(() => {
