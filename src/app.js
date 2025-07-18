@@ -67,6 +67,42 @@ app.get('/feed', async (req, res) => {
 	}
 });
 
+app.delete('/user', async (req, res) => {
+	const userId = req.body.userId;
+	try {
+		const user = await User.findByIdAndDelete(userId);
+		res.status(200).send('User deleted successfully');
+	} catch (err) {
+		res.status(404).send('something went wrong');
+	}
+});
+
+// app.patch('/user', async (req, res) => {
+// 	const data = req.body;
+// 	const userId = req.body.userId;
+// 	try {
+// 		const user = await User.findByIdAndUpdate({ _id: userId }, data, {
+// 			returnDocument: 'before',
+// 		});
+// 		res.status(200).send('User updated successfully');
+// 	} catch (err) {
+// 		res.status(404).send('something went wrong');
+// 	}
+// });
+
+app.patch('/user', async (req, res) => {
+	const data = req.body;
+	console.log(data);
+	const email = req.body.emailId;
+	console.log(email);
+	try {
+		await User.findOneAndUpdate({ emailId: email }, data);
+		res.status(200).send('User updated successfully');
+	} catch {
+		res.status(404).send('something went wrong');
+	}
+});
+
 //We calling connect DB first becaause we should always connect to the DB before we start listening to the incoming requests on the server.
 connectDB()
 	.then(() => {
