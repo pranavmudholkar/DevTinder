@@ -61,9 +61,7 @@ app.post('/login', async (req, res) => {
 	try {
 		const { emailId, password } = req.body;
 		if (!validator.isEmail(emailId)) {
-			throw new Error(
-				'Entered Email is not valid! Please enter a valid Email ID'
-			);
+			throw new Error('Ivalid Credentials');
 		}
 		const user = await User.findOne({ emailId: emailId });
 		if (!user) {
