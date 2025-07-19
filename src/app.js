@@ -1,7 +1,10 @@
 const express = require('express');
 const User = require('./models/user');
 const connectDB = require('./config/database');
+const validator = require('validator');
+const { validateSignUpData } = require('./utils/validation');
 const app = express();
+const bcrypt = require('bcrypt');
 
 app.use(express.json());
 
@@ -24,13 +27,52 @@ app.post('/signup', async (req, res, next) => {
 	// 	password: 'Dhoni@777',
 	// });
 
-	const user = new User(req.body);
+	//---------------------------------------------------------------------------------------------------------------------------------------
 	try {
+		//validation of data
+		validateSignUpData(req);
+		//encrypt the password
+
+		const { firstName, lastName, emailId, password } = req.body;
+
+		console.log(password);
+
+		const passwordHash = await bcrypt.hash(password, 10);
+
+		console.log(passwordHash);
+		//create a new instance of the User
+
+		const user = new User({
+			firstName,
+			lastName,
+			emailId,
+			password: passwordHash,
+		});
+
 		await user.save();
 
-		res.send('User added successfully');
-	} catch {
-		res.status(400).send('Error saving the user: ' + err.message);
+		res.send('User added successfuly');
+	} catch (err) {
+		res.status(400).send('ERROR: ' + err.message);
+	}
+});
+
+app.post('/login', async (req, res) => {
+	try {
+		const { emailId, password } = req.body;
+		if (!validator.isEmail(emailId)) {
+			throw new Error('Ivalid Credentials');
+		}
+		const user = await User.findOne({ emailId: emailId });
+		if (!user) {
+			throw new Error('Ivalid Credentials');
+		}
+		const isPassowrdValid = await bcrypt.compare(password, user.password);
+
+		if (isPassowrdValid) res.send('Login successful');
+		else throw new Error('Login unsuccessful');
+	} catch (err) {
+		res.status(400).send('ERROR: ' + err.message);
 	}
 });
 
@@ -71,7 +113,7 @@ app.delete('/user', async (req, res) => {
 	const userId = req.body.userId;
 	try {
 		const user = await User.findByIdAndDelete(userId);
-		res.status(200).send('User deleted successfully');
+		res.status(200).send('User deleted successfuly');
 	} catch (err) {
 		res.status(404).send('something went wrong');
 	}
@@ -91,7 +133,7 @@ app.patch('/user/:userId', async (req, res) => {
 		const user = await User.findByIdAndUpdate({ _id: userId }, data, {
 			returnDocument: 'before',
 		});
-		res.status(200).send('User updated successfully');
+		res.status(200).send('User updated successfuly');
 	} catch (err) {
 		res.status(404).send('something went wrong');
 	}
@@ -105,7 +147,7 @@ app.patch('/user/:userId', async (req, res) => {
 // 	try {
 
 // 		await User.findOneAndUpdate({ emailId: email }, data);
-// 		res.status(200).send('User updated successfully');
+// 		res.status(200).send('User updated successfuly');
 // 	} catch {
 // 		res.status(404).send('something went wrong');
 // 	}
