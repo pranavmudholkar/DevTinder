@@ -5,8 +5,11 @@ const validator = require('validator');
 const { validateSignUpData } = require('./utils/validation');
 const app = express();
 const bcrypt = require('bcrypt');
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.post('/signup', async (req, res, next) => {
 	// const userObj = {
@@ -35,11 +38,8 @@ app.post('/signup', async (req, res, next) => {
 
 		const { firstName, lastName, emailId, password } = req.body;
 
-		console.log(password);
-
 		const passwordHash = await bcrypt.hash(password, 10);
 
-		console.log(passwordHash);
 		//create a new instance of the User
 
 		const user = new User({
@@ -69,8 +69,12 @@ app.post('/login', async (req, res) => {
 		}
 		const isPassowrdValid = await bcrypt.compare(password, user.password);
 
-		if (isPassowrdValid) res.send('Login successful');
-		else throw new Error('Login unsuccessful');
+		if (isPassowrdValid) {
+			const token = jwt.sign({ _id: user._id }, 'DEV@Tinder@790');
+
+			res.cookie('token', token);
+			res.send('Login successful');
+		} else throw new Error('Login unsuccessful');
 	} catch (err) {
 		res.status(400).send('ERROR: ' + err.message);
 	}
@@ -109,6 +113,30 @@ app.get('/feed', async (req, res) => {
 	}
 });
 
+app.get('/profile', async (req, res) => {
+	try {
+		const cookies = req.cookies;
+
+		const { token } = cookies;
+
+		if (!token) {
+			throw new Error('Invalid Token!!');
+		}
+
+		const decodedMessage = await jwt.verify(token, 'DEV@Tinder@790');
+		const { _id } = decodedMessage;
+
+		if (!user) {
+			throw new Error('Please login again');
+		}
+
+		const user = await User.findById(_id);
+		res.send(user);
+	} catch (err) {
+		res.status(404).send('something went wrong');
+	}
+});
+
 app.delete('/user', async (req, res) => {
 	const userId = req.body.userId;
 	try {
@@ -141,9 +169,7 @@ app.patch('/user/:userId', async (req, res) => {
 
 // app.patch('/user', async (req, res) => {
 // 	const data = req.body;
-// 	console.log(data);
 // 	const email = req.body.emailId;
-// 	console.log(email);
 // 	try {
 
 // 		await User.findOneAndUpdate({ emailId: email }, data);
