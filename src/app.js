@@ -71,46 +71,17 @@ app.post('/login', async (req, res) => {
 		const isPassowrdValid = await bcrypt.compare(password, user.password);
 
 		if (isPassowrdValid) {
-			const token = jwt.sign({ _id: user._id }, 'DEV@Tinder@790');
+			const token = jwt.sign({ _id: user._id }, 'DEV@Tinder@790', {
+				expiresIn: '7d',
+			});
 
-			res.cookie('token', token);
+			res.cookie('token', token, {
+				expires: new Date(Date.now() + 8 * 3600000),
+			});
 			res.send('Login successful');
 		} else throw new Error('Login unsuccessful');
 	} catch (err) {
 		res.status(400).send('ERROR: ' + err.message);
-	}
-});
-
-app.get('/user', async (req, res) => {
-	try {
-		const user = await User.findOne({
-			emailId: req.body.emailId,
-		});
-		if (!user) res.status(404).send('user not found');
-		else res.send(user);
-		// const users = await User.find({
-		// 	emailId: req.body.emailId,
-		// });
-		// if (users.length === 0) {
-		// 	res.status(404).send('user not found');
-		// } else {
-		// 	res.send(users);
-		// }
-	} catch (err) {
-		res.status(404).send('something went wrong');
-	}
-});
-
-app.get('/feed', async (req, res) => {
-	try {
-		const users = await User.find();
-		if (users.length === 0) {
-			res.status(404).send('Data not found');
-		} else {
-			res.send(users);
-		}
-	} catch (err) {
-		res.status(404).send('something went wrong');
 	}
 });
 
@@ -123,34 +94,11 @@ app.get('/profile', userAuth, async (req, res) => {
 	}
 });
 
-app.delete('/user', async (req, res) => {
-	const userId = req.body.userId;
-	try {
-		const user = await User.findByIdAndDelete(userId);
-		res.status(200).send('User deleted successfuly');
-	} catch (err) {
-		res.status(404).send('something went wrong');
-	}
-});
+app.post('/sendConnectionRequest', userAuth, async (req, res) => {
+	const user = req.user;
+	console.log('Sending a connection request');
 
-app.patch('/user/:userId', async (req, res) => {
-	const data = req.body;
-	const userId = req.params.userId;
-	try {
-		const ALLOWED_UPDATES = ['photoURL', 'skills', 'age', 'gender', 'about'];
-		const isUpdateAllowed = Object.keys(data).every((k) =>
-			ALLOWED_UPDATES.includes(k)
-		);
-		if (!isUpdateAllowed) {
-			throw new Error('Update is not allowed.');
-		}
-		const user = await User.findByIdAndUpdate({ _id: userId }, data, {
-			returnDocument: 'before',
-		});
-		res.status(200).send('User updated successfuly');
-	} catch (err) {
-		res.status(404).send('something went wrong');
-	}
+	res.send(user.firstName + 'sent the connection request!!');
 });
 
 // app.patch('/user', async (req, res) => {
