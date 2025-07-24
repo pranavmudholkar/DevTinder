@@ -2,8 +2,6 @@ const express = require('express');
 const requestsRouter = express.Router();
 const { userAuth } = require('../middleware/auth');
 const cookieParser = require('cookie-parser');
-// app.use(express.json());
-// app.use(cookieParser());
 
 const User = require('../models/user');
 
