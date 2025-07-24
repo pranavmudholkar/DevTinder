@@ -12,4 +12,33 @@ const validateSignUpData = (req) => {
 		);
 };
 
-module.exports = { validateSignUpData };
+const validateEditProfileData = (req) => {
+	const allowedEditableFields = [
+		'firstName',
+		'lastName',
+		'emailId',
+		'photoURL',
+		'gender',
+		'skills',
+		'age',
+		'about',
+	];
+	isEditAllowed = Object.keys(req.body).every((field) =>
+		allowedEditableFields.includes(field)
+	);
+	return isEditAllowed;
+};
+
+const validateEditPasswordData = async (req) => {
+	const { newPassword, confirmNewPassword } = req.body;
+
+	if (!validator.isStrongPassword(newPassword))
+		throw new Error(
+			'New Password is not strong enough! Please enter a new password'
+		);
+};
+module.exports = {
+	validateSignUpData,
+	validateEditProfileData,
+	validateEditPasswordData,
+};

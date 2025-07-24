@@ -2,13 +2,9 @@ const express = require('express');
 const authRouter = express.Router();
 
 const User = require('../models/user');
-const { validateSignUpData } = require('../utils/validation');
 const validator = require('validator');
+const { validateSignUpData } = require('../utils/validation');
 const bcrypt = require('bcrypt');
-
-const cookieParser = require('cookie-parser');
-// app.use(express.json());
-// app.use(cookieParser());
 
 authRouter.post('/signup', async (req, res, next) => {
 	// const userObj = {
@@ -79,6 +75,14 @@ authRouter.post('/login', async (req, res) => {
 	} catch (err) {
 		res.status(400).send('ERROR: ' + err.message);
 	}
+});
+
+authRouter.post('/logout', async (req, res) => {
+	res
+		.cookie('token', null, { expires: new Date(Date.now()) })
+		.status(200)
+		.send('Logout successful');
+	// res.send();
 });
 
 module.exports = authRouter;
