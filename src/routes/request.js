@@ -47,7 +47,11 @@ requestsRouter.post(
 
 			const data = await connectionRequest.save();
 			res.json({
-				message: 'Connection request sent successfully!',
+				message: `${req.user.firstName} ${
+					status == 'interested'
+						? `has sent a Connection request to ${isToUserIdValid.firstName}`
+						: `has ignored the Connection request of ${isToUserIdValid.firstName}`
+				} `,
 				data,
 			});
 		} catch (err) {
