@@ -47,7 +47,7 @@ profileRouter.patch('/profile/password', userAuth, async (req, res) => {
 				loggedInUser.password
 			);
 			if (!passwordValid) {
-				loggedInUser['password'] = req.body.newPassword;
+				loggedInUser['password'] = await bcrypt.hash(req.body.newPassword, 10);
 				await loggedInUser.save();
 				res.json({
 					message: `${loggedInUser.firstName} your profile was updated successful`,

@@ -11,11 +11,13 @@ app.use(cookieParser());
 const authRouter = require('./routes/auth');
 const profileRouter = require('./routes/profile');
 const requestsRouter = require('./routes/request');
+const userRouter = require('./routes/user');
 
 //The requests will come to this point and then move inside the routers and check if the intenteded route is present inside that particular Handler.
 app.use('/', authRouter);
 app.use('/', profileRouter);
 app.use('/', requestsRouter);
+app.use('/', userRouter);
 
 //ConnectDB returns a promise
 connectDB()
