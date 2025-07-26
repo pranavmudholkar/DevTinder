@@ -2,6 +2,7 @@ const express = require('express');
 const { userAuth } = require('../middleware/auth');
 const userRouter = express.Router();
 const connectionRequest = require('../models/connectionRequest');
+const User = require('../models/user');
 
 const USER_SAFEDATA = [
 	'firstName',
@@ -28,7 +29,7 @@ userRouter.get('/user/requests/received', userAuth, async (req, res) => {
 			data: connectionRequests,
 		});
 	} catch (err) {
-		res.status(400).send('ERROR: ' + err.message);
+		res.status(400).json({ message: err.message });
 	}
 });
 
@@ -55,8 +56,35 @@ userRouter.get('/user/connections', userAuth, async (req, res) => {
 			data,
 		});
 	} catch (err) {
-		res.status(400).send('ERROR: ' + err.message);
+		res.status(400).json({ message: err.message });
 	}
 });
 
+userRouter.get('/user/feed', userAuth, async (req, res) => {
+	try {
+		const loggedInUser = req.user;
+		const connectionRequests = connectionRequest
+			.find({
+				$or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+			})
+			.select('fromUserId toUserId');
+
+		hideUsersFromFeed = new Set();
+		(await connectionRequests).forEach((req) => {
+			hideUsersFromFeed.add(req.fromUserId.toString());
+			hideUsersFromFeed.add(req.toUserId.toString());
+		});
+
+		const users = await User.find({
+			$and: [
+				{ _id: { $nin: Array.from(hideUsersFromFeed) } },
+				{ _id: { $ne: loggedInUser._id } },
+			],
+		}).select(USER_SAFEDATA);
+
+		res.send(users);
+	} catch (err) {
+		res.status(400).json({ message: err.message });
+	}
+});
 module.exports = userRouter;

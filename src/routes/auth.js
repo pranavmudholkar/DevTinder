@@ -48,7 +48,7 @@ authRouter.post('/signup', async (req, res, next) => {
 
 		res.send('User added successfuly');
 	} catch (err) {
-		res.status(400).send('ERROR: ' + err.message);
+		res.status(400).json({ message: err.message });
 	}
 });
 
@@ -73,7 +73,7 @@ authRouter.post('/login', async (req, res) => {
 			res.send('Login successful');
 		} else throw new Error('Login unsuccessful');
 	} catch (err) {
-		res.status(400).send('ERROR: ' + err.message);
+		res.status(400).json({ message: err.message });
 	}
 });
 
