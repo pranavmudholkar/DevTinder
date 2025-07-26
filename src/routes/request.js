@@ -55,7 +55,7 @@ requestsRouter.post(
 				data,
 			});
 		} catch (err) {
-			res.status(400).send('ERROR: ' + err.message);
+			res.status(400).json({ message: err.message });
 		}
 	}
 );
@@ -103,7 +103,7 @@ requestsRouter.post(
 				data: data,
 			});
 		} catch (err) {
-			res.status(400).send('ERROR: ' + err.message);
+			res.status(400).json({ message: err.message });
 		}
 	}
 );
