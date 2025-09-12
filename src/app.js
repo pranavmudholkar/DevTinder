@@ -1,34 +1,40 @@
-const express = require('express');
-const User = require('./models/user');
-const connectDB = require('./config/database');
+const express = require("express");
+const User = require("./models/user");
+const connectDB = require("./config/database");
 const app = express();
-const validator = require('validator');
-
-const cookieParser = require('cookie-parser');
+const validator = require("validator");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
 app.use(express.json());
 app.use(cookieParser());
+app.use(
+  cors({
+    origin: "http://localhost:5173/login",
+    credentials: true,
+  })
+);
 
-const authRouter = require('./routes/auth');
-const profileRouter = require('./routes/profile');
-const requestsRouter = require('./routes/request');
-const userRouter = require('./routes/user');
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
+const requestsRouter = require("./routes/request");
+const userRouter = require("./routes/user");
 
 //The requests will come to this point and then move inside the routers and check if the intenteded route is present inside that particular Handler.
-app.use('/', authRouter);
-app.use('/', profileRouter);
-app.use('/', requestsRouter);
-app.use('/', userRouter);
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestsRouter);
+app.use("/", userRouter);
 
 //ConnectDB returns a promise
 connectDB()
-	//We calling connect DB first becaause we should always connect to the DB before we start listening to the incoming requests on the server.
-	.then(() => {
-		console.log('Database connection established');
+  //We calling connect DB first becaause we should always connect to the DB before we start listening to the incoming requests on the server.
+  .then(() => {
+    console.log("Database connection established");
 
-		app.listen(7777, () => {
-			console.log('Hi From the port 7777');
-		});
-	})
-	.catch((err) => {
-		console.log('Database connection could not be established');
-	});
+    app.listen(7777, () => {
+      console.log("Hi From the port 7777");
+    });
+  })
+  .catch((err) => {
+    console.log("Database connection could not be established");
+  });
